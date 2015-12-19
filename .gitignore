@@ -1,0 +1,8 @@
+.idea/
+venv/
+.*~
+*~
+*.pyc
+
+discord.log
+config.yaml
