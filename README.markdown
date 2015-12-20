@@ -39,7 +39,7 @@ To install dependencies, run
 
 To run the bot, run
 
-    python bot.py
+    python run.py
 
 License
 -------
