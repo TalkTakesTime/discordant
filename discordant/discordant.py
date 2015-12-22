@@ -27,8 +27,7 @@ class Discordant(discord.Client):
 
     def on_message(self, message):
         # TODO: logging
-        for handler_name, trigger in Discordant._handlers.values():
-            print('trying', handler_name, 'with', trigger.pattern)
+        for handler_name, trigger in Discordant._handlers.items():
             match = trigger.search(message.content)
             if match is not None:
                 # TODO: do this in a new thread
