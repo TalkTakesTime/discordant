@@ -15,6 +15,7 @@ class Discordant(discord.Client):
         try:
             config = ConfigParser()
             config.read(config_file)
+            self._config = config
             self.email = config.get('Login', 'email')
             self.password = config.get('Login', 'password')
         except FileNotFoundError:
