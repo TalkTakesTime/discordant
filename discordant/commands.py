@@ -21,7 +21,7 @@ def _youtube_search(self, match, message):
         'key': self._config.get('API-Keys', 'youtube'),
         'part': 'snippet',
         'maxResults': 1,
-        'q': match.group(1)
+        'q': match.group(2)
     }
 
     res = requests.get(base_req_url, req_args)
