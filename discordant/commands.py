@@ -14,14 +14,15 @@ def _ayy_lmao(self, match, message):
     self.send_message(message.channel, 'lmao')
 
 
-@Discordant.register_handler(r'^!(?:youtube|yt) ([^\n]+)$')
-def _youtube_search(self, match, message):
+@Discordant.register_command('youtube')
+def _youtube_search(self, args, message):
     base_req_url = 'https://www.googleapis.com/youtube/v3/search'
     req_args = {
-        'key': self._config.get('API-Keys', 'youtube'),
+        'key': self.config.get('API-Keys', 'youtube'),
         'part': 'snippet',
+        'type': 'video',
         'maxResults': 1,
-        'q': match.group(1)
+        'q': args
     }
 
     res = requests.get(base_req_url, req_args)
@@ -38,14 +39,13 @@ def _youtube_search(self, match, message):
                           json['items'][0]['id']['videoId'])
 
 
-@Discordant.register_handler(r'^!u(?:rban)? ([^\n]+)$')
-def _urban_dictionary_search(self, match, message):
+@Discordant.register_command('urban')
+def _urban_dictionary_search(self, args, message):
     # this entire function is an egregious violation of the DRY
     # principle, so TODO: abstract out the request part of these functions
     base_req_url = 'http://api.urbandictionary.com/v0/define'
-    req_args = {'term': match.group(1).strip()}
 
-    res = requests.get(base_req_url, req_args)
+    res = requests.get(base_req_url, {'term': args})
     if not res.ok:
         self.send_message(message.channel, 'Error:', res.status_code,
                           '-', res.reason)
