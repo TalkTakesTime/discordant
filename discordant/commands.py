@@ -69,3 +69,38 @@ def _urban_dictionary_search(self, args, message):
             re.sub(r'/\d*$', '', entry['permalink']))
 
         self.send_message(message.channel, reply)
+
+
+_memos = {}
+
+
+@Discordant.register_command('remember')
+def _remember(self, args, message):
+    global _memos
+
+    key, *memo = args.split()
+    if len(memo) == 0:
+        if key in _memos:
+            del _memos[key]
+            self.send_message(message.channel, 'Forgot ' + key + '.')
+        else:
+            self.send_message(message.channel,
+                              'Nothing given to remember.')
+        return
+
+    memo = args[len(key):].strip()
+    _memos[key] = memo
+    self.send_message(
+        message.channel,
+        "Remembered message '{}' for key '{}'.".format(memo, key))
+
+
+@Discordant.register_command('recall')
+def _recall(self, args, message):
+    global _memos
+    if args not in _memos:
+        self.send_message(message.channel,
+                          'Nothing currently remembered for ' + args + '.')
+        return
+
+    self.send_message(message.channel, _memos[args])
