@@ -21,7 +21,7 @@ and create a new virtualenv
 
 replacing `venv` with the desired name. To begin using the virtualenv, run
 
-    ./venv/bin/activate
+    source ./venv/bin/activate
 
 if on *nix, or
 
