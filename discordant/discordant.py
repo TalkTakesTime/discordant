@@ -1,10 +1,10 @@
 import discord
 from collections import namedtuple
 from configparser import ConfigParser
+from inspect import iscoroutinefunction
 from os import path
 import sys
 import re
-from threading import Thread
 
 
 Command = namedtuple('Command', ['name', 'arg_func', 'aliases'])
@@ -51,20 +51,19 @@ class Discordant(discord.Client):
                 self._aliases[alias] = cmd_name
                 self._commands[cmd_name].aliases.append(alias)
 
-    def on_message(self, message):
+    async def on_message(self, message):
         # TODO: logging
         if message.content[0] == self.command_char:
-            self.run_command(message)
+            await self.run_command(message)
             return
 
         for handler_name, trigger in self._handlers.items():
             match = trigger.search(message.content)
             if match is not None:
-                Thread(target=getattr(self, handler_name),
-                       args=(match, message)).start()
+                await getattr(self, handler_name)(match, message)
             # do we return after the first match? or allow multiple matches
 
-    def run_command(self, message):
+    async def run_command(self, message):
         cmd_name, *args = message.content.split(' ')
         cmd_name = cmd_name[1:]
         args = ' '.join(args).strip()
@@ -72,8 +71,7 @@ class Discordant(discord.Client):
         if cmd_name in self._aliases:
             cmd = self._commands[self._aliases[cmd_name]]
             args = cmd.arg_func(args)
-            Thread(target=getattr(self, cmd.name),
-                   args=(args, message)).start()
+            await getattr(self, cmd.name)(args, message)
 
     @classmethod
     def register_handler(cls, trigger, regex_flags=0):
@@ -90,6 +88,11 @@ class Discordant(discord.Client):
         cls._triggers.add(trigger.pattern)
 
         def wrapper(func):
+            if not iscoroutinefunction(func):
+                print('Handler for trigger "{}" must be a coroutine'.format(
+                    trigger.pattern))
+                sys.exit(-1)
+
             func_name = '_trg_' + func.__name__
             # disambiguate the name if another handler has the same name
             while func_name in cls._handlers:
@@ -107,6 +110,11 @@ class Discordant(discord.Client):
         aliases.append(name)
 
         def wrapper(func):
+            if not iscoroutinefunction(func):
+                print('Handler for command "{}" must be a coroutine'.format(
+                    name))
+                sys.exit(-1)
+
             func_name = '_cmd_' + func.__name__
             while func_name in cls._commands:
                 func_name += '_'
