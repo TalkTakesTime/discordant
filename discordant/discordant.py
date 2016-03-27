@@ -26,7 +26,9 @@ class Discordant(discord.Client):
         self.config = ConfigParser()
 
         self.load_config(config_file)
-        self.login(self.__email, self._password)
+
+    def run(self):
+        super().run(self.__email, self._password)
 
     def load_config(self, config_file):
         if not path.exists(config_file):
