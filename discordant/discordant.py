@@ -20,15 +20,14 @@ class Discordant(discord.Client):
     def __init__(self, config_file='config.ini'):
         super().__init__()
 
-        self.__email = ''  # prevent a conflict with discord.Client#email
-        self._password = ''
+        self._token = ''
         self.command_char = ''
         self.config = ConfigParser()
 
         self.load_config(config_file)
 
     def run(self):
-        super().run(self.__email, self._password)
+        super().run(self._token)
 
     def load_config(self, config_file):
         if not path.exists(config_file):
@@ -38,8 +37,7 @@ class Discordant(discord.Client):
             sys.exit(-1)
 
         self.config.read(config_file)
-        self.__email = self.config.get('Login', 'email')
-        self._password = self.config.get('Login', 'password')
+        self._token = self.config.get('Login', 'token')
         self.command_char = self.config.get('Commands', 'command_char')
         self.load_aliases()
 
@@ -64,6 +62,16 @@ class Discordant(discord.Client):
             if match is not None:
                 await getattr(self, handler_name)(match, message)
             # do we return after the first match? or allow multiple matches
+
+    async def on_ready(self):
+        if len(self.servers) == 0:
+            app_info = await self.application_info()
+            print("Not currently associated with any servers")
+            print("Bots cannot accept server invitations")
+            print("Follow: https://discordapp.com/oauth2/authorize?"
+                  "client_id=" + app_info.id + "&scope=bot")
+        else:
+            print(self.servers)
 
     async def run_command(self, message):
         cmd_name, *args = message.content.split(' ')
