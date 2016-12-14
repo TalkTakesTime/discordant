@@ -1,7 +1,13 @@
 from .discordant import Discordant
-import asyncio
 import re
 import requests
+from functools import partial
+import asyncio
+
+
+async def perform_async(func, *args, **kwargs):
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, partial(func, *args, **kwargs))
 
 
 @Discordant.register_handler(r'^ping$', re.I)
@@ -27,7 +33,7 @@ async def _youtube_search(self, args, message):
         'q': args
     }
 
-    res = requests.get(base_req_url, req_args)
+    res = await perform_async(requests.get, base_req_url, req_args)
     if not res.ok:
         await self.send_message(message.channel, 'Error:',
                                 res.status_code, '-', res.reason)
@@ -47,7 +53,7 @@ async def _urban_dictionary_search(self, args, message):
     # principle, so TODO: abstract out the request part of these functions
     base_req_url = 'http://api.urbandictionary.com/v0/define'
 
-    res = requests.get(base_req_url, {'term': args})
+    res = await perform_async(requests.get, base_req_url, {'term': args})
     if not res.ok:
         await self.send_message(message.channel, 'Error:',
                                 res.status_code, '-', res.reason)
