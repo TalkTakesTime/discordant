@@ -163,9 +163,9 @@ def _create_story_list_embed(story_json_list, stories_type):
         if time_ago.days > 0:
             time_ago = f'{int(time_ago.days)} days ago'
         elif time_ago.total_seconds() > 60 * 60:
-            time_ago = f'{time_ago.total_seconds() // (60 * 60)} hours ago'
+            time_ago = f'{int(time_ago.total_seconds() // (60 * 60))} hours ago'
         else:
-            time_ago = f'{time_ago.total_seconds() // 60} minutes ago'
+            time_ago = f'{int(time_ago.total_seconds() // 60)} minutes ago'
 
         embed.add_field(
             name=story_json['title'],
