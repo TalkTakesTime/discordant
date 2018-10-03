@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from discordant import Discordant, configure_logging
+from src import Discordant, configure_logging
 
 
 if __name__ == '__main__':

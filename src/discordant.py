@@ -53,7 +53,7 @@ class Discordant(discord.Client):
 
     async def on_message(self, message):
         # TODO: logging
-        if message.content[0] == self.command_char:
+        if len(message.content) > 0 and message.content[0] == self.command_char:
             await self.run_command(message)
             return
 
@@ -71,7 +71,7 @@ class Discordant(discord.Client):
             print("Follow: https://discordapp.com/oauth2/authorize?"
                   "client_id=" + app_info.id + "&scope=bot")
         else:
-            print(self.servers)
+            print(list(map(lambda server: server.name, self.servers)))
 
     async def run_command(self, message):
         cmd_name, *args = message.content.split(' ')
